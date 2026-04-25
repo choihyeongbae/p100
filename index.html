@@ -1,787 +1,174 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>기록 측정 시스템</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .nav-tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e0e0e0;
-        }
-
-        .nav-tab {
-            flex: 1;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #666;
-            transition: all 0.3s;
-            border: none;
-            background: none;
-        }
-
-        .nav-tab:hover {
-            background: #e9ecef;
-        }
-
-        .nav-tab.active {
-            background: white;
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .timer-display {
-            text-align: center;
-            margin: 30px 0;
-        }
-
-        .time {
-            font-size: 4em;
-            font-weight: bold;
-            color: #667eea;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 5px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin: 30px 0;
-        }
-
-        button {
-            padding: 15px 40px;
-            font-size: 1.1em;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-start {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-start:hover {
-            background: #218838;
-            transform: translateY(-2px);
-        }
-
-        .btn-stop {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-stop:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .btn-reset {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-reset:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
-        .btn-save {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-save:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .ranking-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .ranking-table th,
-        .ranking-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .ranking-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-            position: sticky;
-            top: 0;
-        }
-
-        .ranking-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .rank-badge {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            text-align: center;
-            border-radius: 50%;
-            font-weight: bold;
-            color: white;
-        }
-
-        .rank-1 {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-        }
-
-        .rank-2 {
-            background: linear-gradient(135deg, #C0C0C0, #808080);
-        }
-
-        .rank-3 {
-            background: linear-gradient(135deg, #CD7F32, #8B4513);
-        }
-
-        .rank-other {
-            background: #6c757d;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-size: 1.1em;
-        }
-
-        .filter-section {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            font-size: 0.9em;
-            margin-bottom: 10px;
-            opacity: 0.9;
-        }
-
-        .stat-card .value {
-            font-size: 2em;
-            font-weight: bold;
-        }
-
-        .time-input-group {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .time-input-group input {
-            flex: 1;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        .time-separator {
-            font-size: 1.5em;
-            font-weight: bold;
-            padding-bottom: 12px;
-        }
-
-        .record-preview {
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .record-preview .label {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .record-preview .time-display {
-            font-size: 3em;
-            font-weight: bold;
-            color: #667eea;
-            font-family: 'Courier New', monospace;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .btn-delete {
-            background: #dc3545;
-            color: white;
-            padding: 8px 16px;
-            font-size: 0.9em;
-            border-radius: 5px;
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s;
-        }
-
-        .btn-delete:hover {
-            background: #c82333;
-            transform: scale(1.05);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나를 닮은 동물 찾기 🐾</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6ec; --card: #fff9f0; --accent: #ff7043; --accent2: #ffb74d;
+    --text: #3e2723; --muted: #8d6e63; --border: #ffe0b2; --shadow: rgba(255,112,67,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text);
+    min-height: 100vh; padding: 40px 20px;
+    background-image: radial-gradient(circle at 10% 20%, rgba(255,183,77,0.15) 0%, transparent 50%),
+                      radial-gradient(circle at 90% 80%, rgba(255,112,67,0.1) 0%, transparent 50%);
+  }
+  .container { max-width: 680px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 40px; animation: fadeDown 0.6s ease; }
+  .header .emoji-big { font-size: 64px; display: block; margin-bottom: 12px; animation: bounce 2s infinite; }
+  .header h1 { font-family: 'Gaegu', cursive; font-size: 2.4rem; color: var(--accent); }
+  .header p { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
+  .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: 0 4px 24px var(--shadow); animation: fadeUp 0.6s ease 0.2s both; }
+  .card label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1rem; }
+  .card label span { font-weight: 300; color: var(--muted); font-size: 0.85rem; margin-left: 6px; }
+  .tags-wrapper {
+    border: 1.5px solid var(--border); border-radius: 14px; padding: 12px; background: #fff;
+    min-height: 120px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start;
+    cursor: text; transition: border-color 0.2s; margin-bottom: 16px;
+  }
+  .tags-wrapper:focus-within { border-color: var(--accent); }
+  .tag { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #ffe0b2, #ffccbc); color: var(--accent); border-radius: 20px; padding: 5px 12px; font-size: 0.85rem; font-weight: 700; animation: popIn 0.2s ease; }
+  .tag button { background: none; border: none; cursor: pointer; color: var(--accent); font-size: 1rem; opacity: 0.6; }
+  .tag button:hover { opacity: 1; }
+  #tagInput { border: none; outline: none; font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif; color: var(--text); background: transparent; min-width: 160px; flex: 1; }
+  #tagInput::placeholder { color: #d7ccc8; }
+  .hint { font-size: 0.78rem; color: var(--muted); margin-bottom: 20px; }
+  .btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent), #ff5722); color: white; border: none; border-radius: 14px; font-size: 1.05rem; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 16px rgba(255,87,34,0.35); }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,87,34,0.4); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .loading { text-align: center; padding: 40px 20px; animation: fadeUp 0.4s ease; }
+  .paw-loader { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+  .paw-loader span { font-size: 28px; animation: pawBounce 1.2s ease-in-out infinite; }
+  .paw-loader span:nth-child(2) { animation-delay: 0.2s; }
+  .paw-loader span:nth-child(3) { animation-delay: 0.4s; }
+  .result-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 20px; padding: 32px 28px; box-shadow: 0 8px 32px var(--shadow); margin-top: 24px; animation: fadeUp 0.5s ease; }
+  .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1.5px dashed var(--border); }
+  .result-header h2 { font-family: 'Gaegu', cursive; font-size: 1.3rem; color: var(--accent); }
+  .result-text { font-size: 1rem; line-height: 1.85; color: var(--text); white-space: pre-wrap; word-break: keep-all; }
+  .retry-btn { display: block; width: 100%; margin-top: 20px; padding: 12px; background: transparent; border: 1.5px solid var(--accent); border-radius: 12px; color: var(--accent); font-size: 0.9rem; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.15s; }
+  .retry-btn:hover { background: var(--accent); color: white; }
+  .error-box { background: #fff3f3; border: 1.5px solid #ffcdd2; border-radius: 14px; padding: 16px 20px; margin-top: 20px; color: #c62828; font-size: 0.9rem; white-space: pre-wrap; animation: fadeUp 0.3s ease; }
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-20px);}to{opacity:1;transform:translateY(0);} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+  @keyframes bounce { 0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);} }
+  @keyframes pawBounce { 0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-12px);} }
+  @keyframes popIn { from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;} }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>⏱️ [포지컬 100]</h1>
-        </div>
-
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('record')">기록 측정</button>
-            <button class="nav-tab" onclick="switchTab('ranking')">실시간 순위</button>
-        </div>
-
-        <div class="content">
-            <!-- 기록 측정 탭 -->
-            <div id="record-tab" class="tab-content active">
-                <div id="message"></div>
-                
-                <div class="form-group">
-                    <label for="timeSlot">타임 선택</label>
-                    <select id="timeSlot">
-                        <option value="">선택하세요</option>
-                        <option value="1">1타임</option>
-                        <option value="2">2타임</option>
-                        <option value="3">3타임</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="grade">학년</label>
-                    <select id="grade">
-                        <option value="">선택하세요</option>
-                        <option value="1">1학년</option>
-                        <option value="2">2학년</option>
-                        <option value="3">3학년</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="class">반</label>
-                    <select id="class">
-                        <option value="">선택하세요</option>
-                        <option value="1">1반</option>
-                        <option value="2">2반</option>
-                        <option value="3">3반</option>
-                        <option value="4">4반</option>
-                        <option value="5">5반</option>
-                        <option value="6">6반</option>
-                        <option value="7">7반</option>
-                        <option value="8">8반</option>
-                        <option value="9">9반</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="number">번호</label>
-                    <input type="number" id="number" placeholder="번호 입력" min="1" max="25">
-                </div>
-
-                <div class="form-group">
-                    <label for="name">이름</label>
-                    <input type="text" id="name" placeholder="이름 입력">
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">핸드폰 번호</label>
-                    <input type="tel" id="phone" placeholder="010-1234-5678">
-                </div>
-
-                <div class="form-group">
-                    <label>기록 입력</label>
-                    <div class="time-input-group">
-                        <input type="number" id="minutes" placeholder="분" min="0" max="99" value="0">
-                        <span class="time-separator">:</span>
-                        <input type="number" id="seconds" placeholder="초" min="0" max="59" value="0">
-                        <span class="time-separator">.</span>
-                        <input type="number" id="centiseconds" placeholder="1/100" min="0" max="99" value="0">
-                    </div>
-                </div>
-
-                <div class="record-preview">
-                    <div class="label">입력된 기록</div>
-                    <div class="time-display" id="recordDisplay">00:00.00</div>
-                </div>
-
-                <div class="controls">
-                    <button class="btn-save" onclick="saveRecord()">기록 저장</button>
-                </div>
-            </div>
-
-            <!-- 실시간 순위 탭 -->
-            <div id="ranking-tab" class="tab-content">
-                <div id="rankingMessage"></div>
-                
-                <div class="stats-cards">
-                    <div class="stat-card">
-                        <h3>총 참가자</h3>
-                        <div class="value" id="totalCount">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>최고 기록</h3>
-                        <div class="value" id="bestRecord">-</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>평균 기록</h3>
-                        <div class="value" id="avgRecord">-</div>
-                    </div>
-                </div>
-
-                <div class="filter-section">
-                    <div class="filter-group">
-                        <label for="filterTimeSlot">타임 필터</label>
-                        <select id="filterTimeSlot" onchange="filterRanking()">
-                            <option value="">전체</option>
-                            <option value="1">1타임</option>
-                            <option value="2">2타임</option>
-                            <option value="3">3타임</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterGrade">학년 필터</label>
-                        <select id="filterGrade" onchange="filterRanking()">
-                            <option value="">전체</option>
-                            <option value="1">1학년</option>
-                            <option value="2">2학년</option>
-                            <option value="3">3학년</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="filterClass">반 필터</label>
-                        <select id="filterClass" onchange="filterRanking()">
-                            <option value="">전체</option>
-                            <option value="1">1반</option>
-                            <option value="2">2반</option>
-                            <option value="3">3반</option>
-                            <option value="4">4반</option>
-                            <option value="5">5반</option>
-                            <option value="6">6반</option>
-                            <option value="7">7반</option>
-                            <option value="8">8반</option>
-                            <option value="9">9반</option>
-                        </select>
-                    </div>
-                </div>
-
-                <table class="ranking-table">
-                    <thead>
-                        <tr>
-                            <th>순위</th>
-                            <th>타임</th>
-                            <th>학년/반/번호</th>
-                            <th>이름</th>
-                            <th>핸드폰</th>
-                            <th>기록</th>
-                            <th>측정 시간</th>
-                            <th>삭제</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rankingBody">
-                        <tr>
-                            <td colspan="8" class="no-data">아직 기록이 없습니다</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="container">
+  <div class="header">
+    <span class="emoji-big">🐾</span>
+    <h1>나를 닮은 동물 찾기</h1>
+    <p>나의 성격 특성을 입력하면 AI가 닮은 동물을 찾아줘요</p>
+  </div>
+  <div class="card">
+    <label>나의 성격 특성 <span>Enter로 추가, ×로 삭제</span></label>
+    <div class="tags-wrapper" id="tagsWrapper">
+      <input type="text" id="tagInput" placeholder="예: 아침에 일찍 일어나는 걸 싫어함">
     </div>
+    <p class="hint">💡 특성을 하나씩 입력하고 Enter를 누르세요. 여러 개 추가할수록 정확해져요!</p>
+    <button class="btn" id="submitBtn" onclick="analyze()">🔍 내 동물 찾기</button>
+  </div>
+  <div class="loading" id="loading" style="display:none">
+    <div class="paw-loader"><span>🐾</span><span>🐾</span><span>🐾</span></div>
+    <p>Gemini가 열심히 분석 중이에요...</p>
+  </div>
+  <div class="error-box" id="errorBox" style="display:none"></div>
+  <div class="result-card" id="resultCard" style="display:none">
+    <div class="result-header">
+      <span style="font-size:24px">✨</span>
+      <h2>Gemini의 분석 결과</h2>
+    </div>
+    <div class="result-text" id="resultText"></div>
+    <button class="retry-btn" onclick="reset()">↩ 다시 분석하기</button>
+  </div>
+</div>
 
-    <script>
-        // 로컬 스토리지에서 기록 불러오기
-        function loadRecords() {
-            const records = localStorage.getItem('records');
-            const data = records ? JSON.parse(records) : [];
-            
-            // 기존 데이터에 ID가 없으면 추가
-            return data.map((record, index) => {
-                if (!record.id) {
-                    record.id = Date.now() + index;
-                }
-                return record;
-            });
-        }
+<script>
+// ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+const API_KEY = "AIzaSyCp7kvx2NBtGT4Q9hghnd-S1a2VemdjDPw";   // ← 이 줄만 수정!
+// ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-        // 로컬 스토리지에 기록 저장
-        function saveRecords(records) {
-            localStorage.setItem('records', JSON.stringify(records));
-        }
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-        // 기록 미리보기 업데이트
-        function updateRecordPreview() {
-            const minutes = parseInt(document.getElementById('minutes').value) || 0;
-            const seconds = parseInt(document.getElementById('seconds').value) || 0;
-            const centiseconds = parseInt(document.getElementById('centiseconds').value) || 0;
+const tags = [];
 
-            const display = 
-                String(minutes).padStart(2, '0') + ':' +
-                String(seconds).padStart(2, '0') + '.' +
-                String(centiseconds).padStart(2, '0');
+document.getElementById('tagInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const val = this.value.trim();
+    if (val) addTag(val);
+    this.value = '';
+  }
+});
+document.getElementById('tagsWrapper').addEventListener('click', () => document.getElementById('tagInput').focus());
 
-            document.getElementById('recordDisplay').textContent = display;
-        }
+function addTag(text) {
+  tags.push(text);
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.dataset.text = text;
+  tag.innerHTML = `${text} <button onclick="removeTag(this)">×</button>`;
+  document.getElementById('tagsWrapper').insertBefore(tag, document.getElementById('tagInput'));
+}
 
-        // 입력 필드에 이벤트 리스너 추가
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('minutes').addEventListener('input', updateRecordPreview);
-            document.getElementById('seconds').addEventListener('input', updateRecordPreview);
-            document.getElementById('centiseconds').addEventListener('input', updateRecordPreview);
-        });
+function removeTag(btn) {
+  const tag = btn.parentElement;
+  const idx = tags.indexOf(tag.dataset.text);
+  if (idx > -1) tags.splice(idx, 1);
+  tag.remove();
+}
 
-        // 탭 전환
-        function switchTab(tabName) {
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
+async function analyze() {
+  if (API_KEY === "여기에_API_키_붙여넣기") { showError('API 키가 설정되지 않았어요!\nHTML 파일에서 API_KEY를 수정해주세요.'); return; }
+  if (tags.length === 0) { showError('성격 특성을 최소 1개 이상 입력해주세요!'); return; }
 
-            event.target.classList.add('active');
-            document.getElementById(tabName + '-tab').classList.add('active');
+  const traits = tags.map(t => `- ${t}`).join('\n');
+  const prompt = `나는 다음과 같은 사람이야:\n${traits}\n\n나를 어울리는 동물 1마리로 표현하고, 그 이유를 3가지 근거로 설명해줘.\n마지막에 이모지로 요약해줘.`;
 
-            if (tabName === 'ranking') {
-                updateRanking();
-            }
-        }
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
 
-        // 기록 저장
-        function saveRecord() {
-            const timeSlot = document.getElementById('timeSlot').value;
-            const grade = document.getElementById('grade').value;
-            const classNum = document.getElementById('class').value;
-            const number = document.getElementById('number').value;
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const minutes = parseInt(document.getElementById('minutes').value) || 0;
-            const seconds = parseInt(document.getElementById('seconds').value) || 0;
-            const centiseconds = parseInt(document.getElementById('centiseconds').value) || 0;
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || `API 오류 ${res.status}`);
+    const reply = data.candidates[0].content.parts[0].text;
+    showResult(reply);
+  } catch (err) {
+    showError('오류: ' + err.message);
+  } finally {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('submitBtn').disabled = false;
+  }
+}
 
-            if (!timeSlot) {
-                showMessage('타임을 선택해주세요.', 'error');
-                return;
-            }
-
-            if (!grade || !classNum || !number || !name) {
-                showMessage('모든 정보를 입력해주세요.', 'error');
-                return;
-            }
-
-            if (!phone) {
-                showMessage('핸드폰 번호를 입력해주세요.', 'error');
-                return;
-            }
-
-            if (minutes === 0 && seconds === 0 && centiseconds === 0) {
-                showMessage('기록을 입력해주세요.', 'error');
-                return;
-            }
-
-            // 초 단위 검증
-            if (seconds >= 60) {
-                showMessage('초는 0~59 사이의 값을 입력해주세요.', 'error');
-                return;
-            }
-
-            // 1/100초 단위 검증
-            if (centiseconds >= 100) {
-                showMessage('1/100초는 0~99 사이의 값을 입력해주세요.', 'error');
-                return;
-            }
-
-            // 밀리초로 변환 (정확한 계산을 위해)
-            const totalMilliseconds = (minutes * 60 * 1000) + (seconds * 1000) + (centiseconds * 10);
-
-            const timeDisplay = 
-                String(minutes).padStart(2, '0') + ':' +
-                String(seconds).padStart(2, '0') + '.' +
-                String(centiseconds).padStart(2, '0');
-
-            const record = {
-                id: Date.now(), // 고유 ID 추가
-                timeSlot: parseInt(timeSlot),
-                grade: parseInt(grade),
-                class: parseInt(classNum),
-                number: parseInt(number),
-                name: name,
-                phone: phone,
-                time: totalMilliseconds,
-                timeDisplay: timeDisplay,
-                timestamp: new Date().toLocaleString('ko-KR')
-            };
-
-            const records = loadRecords();
-            records.push(record);
-            saveRecords(records);
-
-            // 페이지 맨 위로 스크롤
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            // 팝업 메시지 표시
-            alert('기록이 저장되었습니다!');
-            
-            // 폼 초기화
-            document.getElementById('timeSlot').value = '';
-            document.getElementById('grade').value = '';
-            document.getElementById('class').value = '';
-            document.getElementById('number').value = '';
-            document.getElementById('name').value = '';
-            document.getElementById('phone').value = '';
-            document.getElementById('minutes').value = '0';
-            document.getElementById('seconds').value = '0';
-            document.getElementById('centiseconds').value = '0';
-            updateRecordPreview();
-        }
-
-        // 기록 삭제
-        function deleteRecord(id) {
-            if (!confirm('정말 이 기록을 삭제하시겠습니까?')) {
-                return;
-            }
-
-            const records = loadRecords();
-            const filteredRecords = records.filter(record => record.id !== id);
-            saveRecords(filteredRecords);
-            
-            showRankingMessage('기록이 삭제되었습니다.', 'success');
-            updateRanking();
-        }
-
-        // 순위 탭 메시지 표시
-        function showRankingMessage(text, type) {
-            const messageDiv = document.getElementById('rankingMessage');
-            messageDiv.className = 'message ' + type;
-            messageDiv.textContent = text;
-            messageDiv.style.display = 'block';
-
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 3000);
-        }
-
-        // 메시지 표시
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.className = 'message ' + type;
-            messageDiv.textContent = text;
-            messageDiv.style.display = 'block';
-
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 3000);
-        }
-
-        // 순위 업데이트
-        function updateRanking() {
-            const records = loadRecords();
-            const filtered = filterRecordsBy(records);
-            
-            // 통계 업데이트
-            document.getElementById('totalCount').textContent = filtered.length;
-            
-            if (filtered.length > 0) {
-                const sortedRecords = [...filtered].sort((a, b) => a.time - b.time);
-                document.getElementById('bestRecord').textContent = sortedRecords[0].timeDisplay;
-                
-                const avgTime = filtered.reduce((sum, r) => sum + r.time, 0) / filtered.length;
-                const avgMs = Math.floor((avgTime % 1000) / 10);
-                const avgSec = Math.floor((avgTime / 1000) % 60);
-                const avgMin = Math.floor(avgTime / 60000);
-                const avgDisplay = 
-                    String(avgMin).padStart(2, '0') + ':' +
-                    String(avgSec).padStart(2, '0') + '.' +
-                    String(avgMs).padStart(2, '0');
-                document.getElementById('avgRecord').textContent = avgDisplay;
-            } else {
-                document.getElementById('bestRecord').textContent = '-';
-                document.getElementById('avgRecord').textContent = '-';
-            }
-
-            displayRanking(filtered);
-        }
-
-        // 필터링
-        function filterRecordsBy(records) {
-            const filterTimeSlot = document.getElementById('filterTimeSlot').value;
-            const filterGrade = document.getElementById('filterGrade').value;
-            const filterClass = document.getElementById('filterClass').value;
-
-            return records.filter(record => {
-                if (filterTimeSlot && record.timeSlot !== parseInt(filterTimeSlot)) return false;
-                if (filterGrade && record.grade !== parseInt(filterGrade)) return false;
-                if (filterClass && record.class !== parseInt(filterClass)) return false;
-                return true;
-            });
-        }
-
-        // 필터 적용
-        function filterRanking() {
-            updateRanking();
-        }
-
-        // 순위 표시
-        function displayRanking(records) {
-            const tbody = document.getElementById('rankingBody');
-            
-            if (records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="no-data">기록이 없습니다</td></tr>';
-                return;
-            }
-
-            const sortedRecords = [...records].sort((a, b) => a.time - b.time);
-            
-            tbody.innerHTML = sortedRecords.map((record, index) => {
-                const rank = index + 1;
-                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
-                
-                return `
-                    <tr>
-                        <td><span class="rank-badge ${rankClass}">${rank}</span></td>
-                        <td>${record.timeSlot}타임</td>
-                        <td>${record.grade}학년 ${record.class}반 ${record.number}번</td>
-                        <td>${record.name}</td>
-                        <td>${record.phone}</td>
-                        <td><strong>${record.timeDisplay}</strong></td>
-                        <td>${record.timestamp}</td>
-                        <td><button class="btn-delete" onclick="deleteRecord(${record.id})">삭제</button></td>
-                    </tr>
-                `;
-            }).join('');
-        }
-    </script>
+function showResult(text) {
+  document.getElementById('resultText').textContent = text;
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+}
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = '⚠️ ' + msg;
+  box.style.display = 'block';
+}
+function reset() {
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
 </body>
 </html>
