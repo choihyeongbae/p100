@@ -127,7 +127,7 @@ async function analyze() {
   if (tags.length === 0) { showError('성격 특성을 최소 1개 이상 입력해주세요!'); return; }
 
   const traits = tags.map(t => `- ${t}`).join('\n');
-  const prompt = `나는 다음과 같은 사람이야:\n${traits}\n\n나를 어울리는 동물 1마리로 표현하고, 그 이유를 3가지 근거로 설명해줘.\n마지막에 이모지로 요약해줘.`;
+  const prompt = `나는 다음과 같은 사람이야:\n${traits}\n\n나를 어울리는 동물 1마리로 표현하고, 그 이유를 3가지 근거로 설명해줘.\n마지막에 이모지 5개로 요약해줘.`;
 
   document.getElementById('submitBtn').disabled = true;
   document.getElementById('loading').style.display = 'block';
